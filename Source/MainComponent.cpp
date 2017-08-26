@@ -18,7 +18,7 @@ public:
         LFODepth (50),
         noiseLevel (0.0)
     {
-        setSize (800, 600);
+        setSize (800, 100);
         setAudioChannels (0, 2);
 
         // oscillator
@@ -28,8 +28,18 @@ public:
         oscFrequencyKnob.addListener (this);
 
         addAndMakeVisible (oscFrequencyLabel);
-        oscFrequencyLabel.setText ("OSC FREQ", dontSendNotification);
+        oscFrequencyLabel.setText ("OSC1 FREQ", dontSendNotification);
         oscFrequencyLabel.attachToComponent (&oscFrequencyKnob, true);
+
+        // oscillator 2
+        addAndMakeVisible (osc2FrequencyKnob);
+        osc2FrequencyKnob.setRange (20, 20000);
+        osc2FrequencyKnob.setSkewFactorFromMidPoint (1000.0);
+        osc2FrequencyKnob.addListener (this);
+
+        addAndMakeVisible (osc2FrequencyLabel);
+        osc2FrequencyLabel.setText ("OSC2 FREQ", dontSendNotification);
+        osc2FrequencyLabel.attachToComponent (&osc2FrequencyKnob, true);
 
         // LFO
         addAndMakeVisible (lfoFrequencyKnob);
@@ -77,8 +87,9 @@ public:
 
             for (int sample = 0; sample < bufferToFill.numSamples; ++sample)
             {
-                const float currentSample = (float) (std::sin (currentAngle + LFODepth * std::sin(currentLFOAngle)));
+                const float currentSample = (float) (std::sin (currentAngle + (LFODepth * std::sin(currentLFOAngle)))) + std::sin(currentAngle2 + (LFODepth * std::sin(currentLFOAngle)));
                 currentAngle += angleDelta;
+                currentAngle2 += angleDelta2;
                 currentLFOAngle += LFOAngleDelta;
 
                 float noise = (random.nextFloat() * 0.25f - 0.125f) * noiseLevel;
@@ -91,6 +102,12 @@ public:
     {
         const double cyclesPerSample = oscFrequencyKnob.getValue() / currentSampleRate;
         angleDelta = cyclesPerSample * 2.0 * double_Pi;
+    }
+
+    void updateAngleDelta2()
+    {
+        const double cyclesPerSample = osc2FrequencyKnob.getValue() / currentSampleRate;
+        angleDelta2 = cyclesPerSample * 2.0 * double_Pi;
     }
 
     void updateLFOAngleDelta()
@@ -117,13 +134,19 @@ public:
                 updateAngleDelta();
         }
 
-        if (slider == &lfoFrequencyKnob)
+        else if (slider == &osc2FrequencyKnob)
+        {
+            if (currentSampleRate > 0.0)
+                updateAngleDelta2();
+        }
+
+        else if (slider == &lfoFrequencyKnob)
         {
             if (currentSampleRate > 0.0)
                 updateLFOAngleDelta();
         }
 
-        if (slider == &noiseKnob)
+        else if (slider == &noiseKnob)
         {
             if (currentSampleRate > 0.0)
                 updateNoiseLevel();
@@ -142,12 +165,14 @@ public:
     void resized() override
     {
         oscFrequencyKnob.setBounds (100, 10, getWidth() - 100, 20);
-        lfoFrequencyKnob.setBounds (100, 30, getWidth() - 100, 20);
-        noiseKnob.setBounds (100, 50, getWidth() - 100, 20);
+        osc2FrequencyKnob.setBounds (100, 30, getWidth() - 100, 20);
+        lfoFrequencyKnob.setBounds (100, 50, getWidth() - 100, 20);
+        noiseKnob.setBounds (100, 70, getWidth() - 100, 20);
 
         oscFrequencyLabel.setBounds (10, 10, 100, 20);
-        lfoFrequencyLabel.setBounds (10, 30, 100, 20);
-        noiseLabel.setBounds (10, 50, 100, 20);
+        osc2FrequencyLabel.setBounds (10, 30, 100, 20);
+        lfoFrequencyLabel.setBounds (10, 50, 100, 20);
+        noiseLabel.setBounds (10, 70, 100, 20);
     }
 
 
@@ -157,16 +182,19 @@ private:
     IIRFilter lpf;
 
     Slider oscFrequencyKnob;
+    Slider osc2FrequencyKnob;
     Slider lfoFrequencyKnob;
 
     Slider noiseKnob;
 
     Label oscFrequencyLabel;
+    Label osc2FrequencyLabel;
     Label lfoFrequencyLabel;
 
     Label noiseLabel;
 
     double currentSampleRate, currentAngle, angleDelta;
+    double currentAngle2, angleDelta2;
     double currentLFOAngle, LFOAngleDelta, LFODepth;
     double noiseLevel;
 

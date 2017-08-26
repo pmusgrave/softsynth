@@ -6,6 +6,12 @@
               cppLanguageStandard="11" jucerVersion="5.1.1">
   <MAINGROUP id="O5n2rg" name="synth">
     <GROUP id="{8070DE32-E067-7ED9-52AC-74B14D3F306E}" name="Source">
+      <FILE id="PqrmiU" name="Envelope.cpp" compile="1" resource="0" file="Source/Envelope.cpp"/>
+      <FILE id="tYY0Sf" name="Envelope.h" compile="0" resource="0" file="Source/Envelope.h"/>
+      <FILE id="ePtfq7" name="Filter.cpp" compile="1" resource="0" file="Source/Filter.cpp"/>
+      <FILE id="H4jahw" name="Filter.h" compile="0" resource="0" file="Source/Filter.h"/>
+      <FILE id="Pqopgu" name="Oscillator.cpp" compile="1" resource="0" file="Source/Oscillator.cpp"/>
+      <FILE id="E5yDHn" name="Oscillator.h" compile="0" resource="0" file="Source/Oscillator.h"/>
       <FILE id="XF2F5U" name="MainComponent.cpp" compile="1" resource="0"
             file="Source/MainComponent.cpp"/>
       <FILE id="RBI4zV" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
