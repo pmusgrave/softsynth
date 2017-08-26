@@ -18,15 +18,18 @@ public:
     MainContentComponent()
     :   currentSampleRate (0.0),
         currentAngle (0.0),
-        angleDelta (0.0)
+        angleDelta (0.0),
+        currentLFOAngle (0.0),
+        LFOAngleDelta (0.0),
+        noiseLevel (0.0)
     {
         setSize (800, 600);
         setAudioChannels (0, 2);
 
         // oscillator
         addAndMakeVisible (oscFrequencyKnob);
-        oscFrequencyKnob.setRange (50.0, 5000.0);
-        oscFrequencyKnob.setSkewFactorFromMidPoint (500.0);
+        oscFrequencyKnob.setRange (20, 20000);
+        oscFrequencyKnob.setSkewFactorFromMidPoint (1000.0);
         oscFrequencyKnob.addListener (this);
 
         addAndMakeVisible (oscFrequencyLabel);
@@ -35,8 +38,8 @@ public:
 
         // LFO
         addAndMakeVisible (lfoFrequencyKnob);
-        lfoFrequencyKnob.setRange (50.0, 5000.0);
-        lfoFrequencyKnob.setSkewFactorFromMidPoint (500.0);
+        lfoFrequencyKnob.setRange (0, 200);
+        lfoFrequencyKnob.setSkewFactorFromMidPoint (100);
         lfoFrequencyKnob.addListener (this);
 
         addAndMakeVisible (lfoFrequencyLabel);
@@ -45,8 +48,8 @@ public:
 
         // filter cutoff
         addAndMakeVisible (filterCutoffKnob);
-        filterCutoffKnob.setRange (50.0, 5000.0);
-        filterCutoffKnob.setSkewFactorFromMidPoint (500.0);
+        filterCutoffKnob.setRange (20.0, 20000.0);
+        filterCutoffKnob.setSkewFactorFromMidPoint (1000.0);
         filterCutoffKnob.addListener (this);
 
         addAndMakeVisible (lfoFrequencyLabel);
@@ -55,8 +58,8 @@ public:
 
         // filter resonance
         addAndMakeVisible (filterResonanceKnob);
-        filterResonanceKnob.setRange (50.0, 5000.0);
-        filterResonanceKnob.setSkewFactorFromMidPoint (500.0);
+        filterResonanceKnob.setRange (0.1, 100);
+        filterResonanceKnob.setSkewFactorFromMidPoint (50.0);
         filterResonanceKnob.addListener (this);
 
         addAndMakeVisible (lfoFrequencyLabel);
@@ -105,8 +108,8 @@ public:
 
         // white noise level
         addAndMakeVisible (noiseKnob);
-        noiseKnob.setRange (50.0, 5000.0);
-        noiseKnob.setSkewFactorFromMidPoint (500.0);
+        noiseKnob.setRange (0.0, 1.0);
+        noiseKnob.setSkewFactorFromMidPoint (0.5);
         noiseKnob.addListener (this);
 
         addAndMakeVisible (lfoFrequencyLabel);
@@ -134,14 +137,17 @@ public:
     {
         for (int channel = 0; channel < bufferToFill.buffer->getNumChannels(); ++channel)
         {
-            const float level = 0.125f;
+            const float level = 0.25f;
             float* const buffer = bufferToFill.buffer->getWritePointer (0, bufferToFill.startSample);
 
             for (int sample = 0; sample < bufferToFill.numSamples; ++sample)
             {
-                const float currentSample = (float) std::sin (currentAngle);
-                currentAngle += angleDelta;
-                buffer[sample] = currentSample * level;
+                const float currentSample = (float) std::sin (currentAngle + currentLFOAngle);
+                currentAngle += angleDelta + currentLFOAngle;
+                currentLFOAngle += LFOAngleDelta;
+
+                float noise = (random.nextFloat() * 0.25f - 0.125f) * noiseLevel;
+                buffer[sample] = ((currentSample) * level) + noise;
             }
         }
     }
@@ -150,6 +156,17 @@ public:
     {
         const double cyclesPerSample = oscFrequencyKnob.getValue() / currentSampleRate;
         angleDelta = cyclesPerSample * 2.0 * double_Pi;
+    }
+
+    void updateLFOAngleDelta()
+    {
+        const double cyclesPerSample = lfoFrequencyKnob.getValue() / currentSampleRate;
+        LFOAngleDelta = cyclesPerSample * 2.0 * double_Pi;
+    }
+
+    void updateNoiseLevel()
+    {
+        noiseLevel = noiseKnob.getValue();
     }
 
     void releaseResources() override
@@ -163,6 +180,18 @@ public:
         {
             if (currentSampleRate > 0.0)
                 updateAngleDelta();
+        }
+
+        if (slider == &lfoFrequencyKnob)
+        {
+            if (currentSampleRate > 0.0)
+                updateLFOAngleDelta();
+        }
+
+        if (slider == &noiseKnob)
+        {
+            if (currentSampleRate > 0.0)
+                updateNoiseLevel();
         }
     }
 
@@ -201,6 +230,7 @@ public:
 
 private:
     Random random;
+
     Slider oscFrequencyKnob;
     Slider lfoFrequencyKnob;
     Slider filterCutoffKnob;
@@ -221,7 +251,8 @@ private:
     Label envReleaseLabel;
     Label noiseLabel;
 
-    double currentSampleRate, currentAngle, angleDelta;
+    double currentSampleRate, currentAngle, angleDelta, currentLFOAngle, LFOAngleDelta;
+    double noiseLevel;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainContentComponent)
 };
