@@ -41,66 +41,6 @@ public:
         lfoFrequencyLabel.setText ("LFO FREQ", dontSendNotification);
         lfoFrequencyLabel.attachToComponent (&lfoFrequencyKnob, true);
 
-        // filter cutoff
-        addAndMakeVisible (filterCutoffKnob);
-        filterCutoffKnob.setRange (20.0, 20000.0);
-        filterCutoffKnob.setSkewFactorFromMidPoint (1000.0);
-        filterCutoffKnob.addListener (this);
-
-        addAndMakeVisible (lfoFrequencyLabel);
-        filterCutoffLabel.setText ("CUTOFF", dontSendNotification);
-        filterCutoffLabel.attachToComponent (&filterCutoffKnob, true);
-
-        // filter resonance
-        addAndMakeVisible (filterResonanceKnob);
-        filterResonanceKnob.setRange (0.1, 100);
-        filterResonanceKnob.setSkewFactorFromMidPoint (50.0);
-        filterResonanceKnob.addListener (this);
-
-        addAndMakeVisible (lfoFrequencyLabel);
-        filterResonanceLabel.setText ("RES", dontSendNotification);
-        filterResonanceLabel.attachToComponent (&filterResonanceKnob, true);
-
-        // ADSR Attack
-        addAndMakeVisible (envAttackKnob);
-        envAttackKnob.setRange (50.0, 5000.0);
-        envAttackKnob.setSkewFactorFromMidPoint (500.0);
-        envAttackKnob.addListener (this);
-
-        addAndMakeVisible (lfoFrequencyLabel);
-        envAttackLabel.setText ("ATTACK", dontSendNotification);
-        envAttackLabel.attachToComponent (&envAttackKnob, true);
-
-        // ADSR Decay
-        addAndMakeVisible (envDecayKnob);
-        envDecayKnob.setRange (50.0, 5000.0);
-        envDecayKnob.setSkewFactorFromMidPoint (500.0);
-        envDecayKnob.addListener (this);
-
-        addAndMakeVisible (lfoFrequencyLabel);
-        envDecayLabel.setText ("DECAY", dontSendNotification);
-        envDecayLabel.attachToComponent (&envDecayKnob, true);
-
-        // ADSR Sustain
-        addAndMakeVisible (envSustainKnob);
-        envSustainKnob.setRange (50.0, 5000.0);
-        envSustainKnob.setSkewFactorFromMidPoint (500.0);
-        envSustainKnob.addListener (this);
-
-        addAndMakeVisible (lfoFrequencyLabel);
-        envSustainLabel.setText ("SUSTAIN", dontSendNotification);
-        envSustainLabel.attachToComponent (&envSustainKnob, true);
-
-        // ADSR Release
-        addAndMakeVisible (envReleaseKnob);
-        envReleaseKnob.setRange (50.0, 5000.0);
-        envReleaseKnob.setSkewFactorFromMidPoint (500.0);
-        envReleaseKnob.addListener (this);
-
-        addAndMakeVisible (lfoFrequencyLabel);
-        envReleaseLabel.setText ("RELEASE", dontSendNotification);
-        envReleaseLabel.attachToComponent (&envReleaseKnob, true);
-
         // white noise level
         addAndMakeVisible (noiseKnob);
         noiseKnob.setRange (0.0, 1.0);
@@ -137,7 +77,7 @@ public:
 
             for (int sample = 0; sample < bufferToFill.numSamples; ++sample)
             {
-                const float currentSample = (float) (std::sin (currentAngle + LFODepth* std::sin(currentLFOAngle)));
+                const float currentSample = (float) (std::sin (currentAngle + LFODepth * std::sin(currentLFOAngle)));
                 currentAngle += angleDelta;
                 currentLFOAngle += LFOAngleDelta;
 
@@ -203,47 +143,27 @@ public:
     {
         oscFrequencyKnob.setBounds (100, 10, getWidth() - 100, 20);
         lfoFrequencyKnob.setBounds (100, 30, getWidth() - 100, 20);
-        filterCutoffKnob.setBounds (100, 50, getWidth() - 100, 20);
-        filterResonanceKnob.setBounds (100, 70, getWidth() - 100, 20);
-        envAttackKnob.setBounds (100, 90, getWidth() - 100, 20);
-        envDecayKnob.setBounds (100, 110, getWidth() - 100, 20);
-        envSustainKnob.setBounds (100, 130, getWidth() - 100, 20);
-        envReleaseKnob.setBounds (100, 150, getWidth() - 100, 20);
-        noiseKnob.setBounds (100, 170, getWidth() - 100, 20);
+        noiseKnob.setBounds (100, 50, getWidth() - 100, 20);
 
         oscFrequencyLabel.setBounds (10, 10, 100, 20);
         lfoFrequencyLabel.setBounds (10, 30, 100, 20);
-        filterCutoffLabel.setBounds (10, 50, 100, 20);
-        filterResonanceLabel.setBounds (10, 70, 100, 20);
-        envAttackLabel.setBounds (10, 90, 100, 20);
-        envDecayLabel.setBounds (10, 110, 100, 20);
-        envSustainLabel.setBounds (10, 130, 100, 20);
-        envReleaseLabel.setBounds (10, 150, 100, 20);
-        noiseLabel.setBounds (10, 170, 100, 20);
+        noiseLabel.setBounds (10, 50, 100, 20);
     }
 
 
 private:
     Random random;
 
+    IIRFilter lpf;
+
     Slider oscFrequencyKnob;
     Slider lfoFrequencyKnob;
-    Slider filterCutoffKnob;
-    Slider filterResonanceKnob;
-    Slider envAttackKnob;
-    Slider envDecayKnob;
-    Slider envSustainKnob;
-    Slider envReleaseKnob;
+
     Slider noiseKnob;
 
     Label oscFrequencyLabel;
     Label lfoFrequencyLabel;
-    Label filterCutoffLabel;
-    Label filterResonanceLabel;
-    Label envAttackLabel;
-    Label envDecayLabel;
-    Label envSustainLabel;
-    Label envReleaseLabel;
+
     Label noiseLabel;
 
     double currentSampleRate, currentAngle, angleDelta;
