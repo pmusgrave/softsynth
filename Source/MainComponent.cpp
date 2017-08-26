@@ -20,7 +20,10 @@ public:
         currentAngle (0.0),
         angleDelta (0.0)
     {
-        // oscillator frequency
+        setSize (800, 600);
+        setAudioChannels (0, 2);
+
+        // oscillator
         addAndMakeVisible (oscFrequencyKnob);
         oscFrequencyKnob.setRange (50.0, 5000.0);
         oscFrequencyKnob.setSkewFactorFromMidPoint (500.0);
@@ -30,7 +33,7 @@ public:
         oscFrequencyLabel.setText ("OSC FREQ", dontSendNotification);
         oscFrequencyLabel.attachToComponent (&oscFrequencyKnob, true);
 
-        // LFO frequency
+        // LFO
         addAndMakeVisible (lfoFrequencyKnob);
         lfoFrequencyKnob.setRange (50.0, 5000.0);
         lfoFrequencyKnob.setSkewFactorFromMidPoint (500.0);
@@ -109,9 +112,6 @@ public:
         addAndMakeVisible (lfoFrequencyLabel);
         noiseLabel.setText ("NOISE", dontSendNotification);
         noiseLabel.attachToComponent (&noiseKnob, true);
-
-        setSize (800, 600);
-        setAudioChannels (0, 2);
     }
 
     ~MainContentComponent()
@@ -126,6 +126,7 @@ public:
         message << "Preparing to play audio...\n";
         message << " samplesPerBlockExpected = " << samplesPerBlockExpected << "\n";
         message << " sampleRate = " << sampleRate;
+        currentSampleRate = sampleRate;
         Logger::getCurrentLogger()->writeToLog (message);
     }
 
