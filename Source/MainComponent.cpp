@@ -1,9 +1,3 @@
-/*
- JUCE doesn't split most auto-generated components into separate header files
- by default, so I'm leaving Maincomponent.cpp as a single file. Everything else
-  is split into separate files for readability
-*/
-
 #ifndef MAINCOMPONENT_H_INCLUDED
 #define MAINCOMPONENT_H_INCLUDED
 
@@ -21,6 +15,7 @@ public:
         angleDelta (0.0),
         currentLFOAngle (0.0),
         LFOAngleDelta (0.0),
+        LFODepth (50),
         noiseLevel (0.0)
     {
         setSize (800, 600);
@@ -142,8 +137,8 @@ public:
 
             for (int sample = 0; sample < bufferToFill.numSamples; ++sample)
             {
-                const float currentSample = (float) std::sin (currentAngle + currentLFOAngle);
-                currentAngle += angleDelta + currentLFOAngle;
+                const float currentSample = (float) (std::sin (currentAngle + LFODepth* std::sin(currentLFOAngle)));
+                currentAngle += angleDelta;
                 currentLFOAngle += LFOAngleDelta;
 
                 float noise = (random.nextFloat() * 0.25f - 0.125f) * noiseLevel;
@@ -251,7 +246,8 @@ private:
     Label envReleaseLabel;
     Label noiseLabel;
 
-    double currentSampleRate, currentAngle, angleDelta, currentLFOAngle, LFOAngleDelta;
+    double currentSampleRate, currentAngle, angleDelta;
+    double currentLFOAngle, LFOAngleDelta, LFODepth;
     double noiseLevel;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainContentComponent)
