@@ -1,5 +1,5 @@
 build/intermediate/Debug/MainComponent_a6ffb4a5.o: \
- ../../Source/MainComponent.cpp \
+ ../../Source/MainComponent.cpp ../../Source/Oscillator.h \
  ../../Source/../JuceLibraryCode/JuceHeader.h \
  ../../Source/../JuceLibraryCode/AppConfig.h \
  /home/paul/Documents/code/JUCE/modules/juce_audio_basics/juce_audio_basics.h \

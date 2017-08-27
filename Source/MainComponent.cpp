@@ -1,6 +1,7 @@
 #ifndef MAINCOMPONENT_H_INCLUDED
 #define MAINCOMPONENT_H_INCLUDED
 
+#include "Oscillator.h"
 #include "../JuceLibraryCode/JuceHeader.h"
 #include <cmath>
 
@@ -8,7 +9,6 @@ class MainContentComponent   : public AudioAppComponent,
                                public Slider::Listener
 {
 public:
-    //==============================================================================
     MainContentComponent()
     :   currentSampleRate (0.0),
         currentAngle (0.0),
@@ -18,8 +18,10 @@ public:
         LFODepth (50),
         noiseLevel (0.0)
     {
-        setSize (800, 100);
+        setSize (800, 300);
         setAudioChannels (0, 2);
+
+        addAndMakeVisible(osc1);
 
         // oscillator
         addAndMakeVisible (oscFrequencyKnob);
@@ -67,6 +69,25 @@ public:
         shutdownAudio();
     }
 
+    void paint (Graphics& g) override
+    {
+    }
+
+    void resized() override
+    {
+        osc1.setBounds (10, 90, getWidth() - 100, 20);
+
+        oscFrequencyKnob.setBounds (100, 10, getWidth() - 100, 20);
+        osc2FrequencyKnob.setBounds (100, 30, getWidth() - 100, 20);
+        lfoFrequencyKnob.setBounds (100, 50, getWidth() - 100, 20);
+        noiseKnob.setBounds (100, 70, getWidth() - 100, 20);
+
+        oscFrequencyLabel.setBounds (10, 10, 100, 20);
+        osc2FrequencyLabel.setBounds (10, 30, 100, 20);
+        lfoFrequencyLabel.setBounds (10, 50, 100, 20);
+        noiseLabel.setBounds (10, 70, 100, 20);
+    }
+
     //==============================================================================
     void prepareToPlay (int samplesPerBlockExpected, double sampleRate) override
     {
@@ -87,8 +108,8 @@ public:
 
             for (int sample = 0; sample < bufferToFill.numSamples; ++sample)
             {
-                const float currentSample = (float) (std::sin (currentAngle + (LFODepth * std::sin(currentLFOAngle)))) + std::sin(currentAngle2 + (LFODepth * std::sin(currentLFOAngle)));
-                currentAngle += angleDelta;
+                const float currentSample = (float) (std::sin (osc1.currentAngle + (LFODepth * std::sin(currentLFOAngle)))) + std::sin(currentAngle2 + (LFODepth * std::sin(currentLFOAngle)));
+                osc1.currentAngle += osc1.angleDelta;
                 currentAngle2 += angleDelta2;
                 currentLFOAngle += LFOAngleDelta;
 
@@ -153,33 +174,10 @@ public:
         }
     }
 
-    //==============================================================================
-    void paint (Graphics& g) override
-    {
-        // (Our component is opaque, so we must completely fill the background with a solid colour)
-        //g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
-
-        // You can add your drawing code here!
-    }
-
-    void resized() override
-    {
-        oscFrequencyKnob.setBounds (100, 10, getWidth() - 100, 20);
-        osc2FrequencyKnob.setBounds (100, 30, getWidth() - 100, 20);
-        lfoFrequencyKnob.setBounds (100, 50, getWidth() - 100, 20);
-        noiseKnob.setBounds (100, 70, getWidth() - 100, 20);
-
-        oscFrequencyLabel.setBounds (10, 10, 100, 20);
-        osc2FrequencyLabel.setBounds (10, 30, 100, 20);
-        lfoFrequencyLabel.setBounds (10, 50, 100, 20);
-        noiseLabel.setBounds (10, 70, 100, 20);
-    }
-
-
 private:
     Random random;
 
-    IIRFilter lpf;
+    Oscillator osc1 {currentSampleRate, "OSC1"};
 
     Slider oscFrequencyKnob;
     Slider osc2FrequencyKnob;
