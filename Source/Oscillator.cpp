@@ -1,12 +1,11 @@
 #include "Oscillator.h"
+#include <iostream>
 
-Oscillator::Oscillator(double sampleRate, String label)
+Oscillator::Oscillator(double minFreq, double maxFreq, double midFreq, String label)
 {
-    currentSampleRate = sampleRate;
-
     addAndMakeVisible (oscFrequency);
-    oscFrequency.setRange (20, 20000);
-    oscFrequency.setSkewFactorFromMidPoint (1000.0);
+    oscFrequency.setRange (minFreq, maxFreq);
+    oscFrequency.setSkewFactorFromMidPoint (midFreq);
     oscFrequency.addListener (this);
 
     addAndMakeVisible (oscLabel);
@@ -20,17 +19,13 @@ Oscillator::~Oscillator()
 
 void Oscillator::resized()
 {
-    oscFrequency.setBounds (100, 0, getWidth() - 100, 20);
-    oscLabel.setBounds (0, 0, 100, 20);
+    oscFrequency.setBounds (100, 0, getWidth(), 20);
+    oscLabel.setBounds (10, 0, 100, 20);
 }
 
 void Oscillator::sliderValueChanged (Slider* slider)
 {
-    if (slider == &oscFrequency)
-    {
-        if (currentSampleRate > 0.0)
-            Oscillator::updateAngleDelta();
-    }
+    Oscillator::updateAngleDelta();
 }
 
 void Oscillator::updateAngleDelta()

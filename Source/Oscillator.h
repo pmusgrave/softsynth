@@ -7,16 +7,16 @@ class Oscillator : public Component,
                    public Slider::Listener
 {
     public:
-        Oscillator(double currentSampleRate, String label);
+        Oscillator(double minFreq, double maxFreq, double midFreq, String label);
         ~Oscillator();
+        double currentAngle, angleDelta;
+        double currentSampleRate;
         //void paint(Graphics &g) override;
         void sliderValueChanged (Slider* slider) override;
         void resized() override;
         void updateAngleDelta();
-        double currentAngle, angleDelta;
 
     private:
-        double currentSampleRate;
         Slider oscFrequency;
         Label oscLabel;
 
